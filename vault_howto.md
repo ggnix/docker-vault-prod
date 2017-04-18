@@ -13,6 +13,15 @@ Install Vault server * [link](https://www.vaultproject.io/intro/getting-started/
 ```
    export VAULT_ADDR='http://127.0.0.1:8200'
 ```
+By default, Vault mounts a backend called generic to secret/. The generic backend reads and writes raw data to the backend storage.
+You can inspect mounts using vault mounts:
+ ```
+   vault mounts
+   Path      Type     Description
+   generic/  generic
+   secret/   generic  generic secret storage
+   sys/      system   system endpoints used for control, policy and debugging
+```
 #### Write your secret:
 ``` 
    vault write secret/hello value=world
@@ -35,18 +44,53 @@ This writes the pair value=world to the path secret/hello. The secret/ prefix is
    vault delete secret/hello
    Success! Deleted 'secret/hello' if it existed.
 ```
+#### AWS credentials generation
+The AWS secret backend for Vault generates AWS access credentials dynamically based on IAM policies. This makes IAM much easier to use: credentials could be generated on the fly.
+The first step to using the aws backend is to mount it. Unlike the generic backend, the aws backend is not mounted by default.
+```
+   vault mount aws
+   Successfully mounted 'aws' at 'aws'!
+```
+Next, we must configure the root credentials that are used to manage IAM credentials:
+```
+    vault write aws/config/root \
+    access_key=AKIAJWVN5Z4FOFT7NLNA \
+    secret_key=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 \
+    region=us-east-1
+```
+Let's create ec2 readonly role using existing aws policy:
+```
+    vault write aws/roles/readonly arn=arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess
+```
+To generate a new set of IAM credentials, we simply read from that role
+
+```
+    valt read aws/creds/readonly
+    Key             Value
+    lease_id        aws/creds/readonly/7cb8df71-782f-3de1-79dd-251778e49f58
+    lease_duration  3600
+    access_key      AKIAIOMYUTSLGJOGLHTQ
+    secret_key      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
+    security_token  <nil>
+``` 
+
 ### Prod mode
 
 #### Vault is configured using HCL files. Configuration file (config.hcl) example:
 ```
-   backend "consul" {
-   address = "127.0.0.1:8500"
-   path = "vault"
+   backend "file" {
+   path = "/opt/vault/filetest"
    }
 
    listener "tcp" {
    address = "127.0.0.1:8200"
    tls_disable = 1
+   }
+   
+   storage "s3" {
+   access_key = "abcd1234"
+   secret_key = "defg5678"
+   bucket     = "my-bucket"
    }
    disable_mlock = true
 ```
