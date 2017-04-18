@@ -1,0 +1,16 @@
+version: '2'
+services:
+  jenkins_container:
+    build:
+      context: "./docker_jenkins_groovy"
+    ports:
+      - 8080:8080
+  vault_container:
+    build:
+      context: "./vault"
+    command: "--cap-add=IPC_LOCK vault server"
+    ports:
+      - 8200:8200
+    environment:
+      - VAULT_ADDR=http://0.0.0.0:8200
+      - 'VAULT_LOCAL_CONFIG=disable_mlock = true {"backend": {"file": {"path": "/vault/file"}}, "default_lease_ttl": "168h", "max_lease_ttl": "720h"}'
