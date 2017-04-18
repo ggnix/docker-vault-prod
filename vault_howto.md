@@ -10,13 +10,16 @@ Install Vault server * [link](https://www.vaultproject.io/intro/getting-started/
    vault server -dev
 ```
 #### Server will start in foreground, export VAULT_ADDR variable:
+
 ```
    export VAULT_ADDR='http://127.0.0.1:8200'
 ```
+
 By default, Vault mounts a backend called generic to secret/. The generic backend reads and writes raw data to the backend storage.
+
 You can inspect mounts using vault mounts:
 
- ```
+```
    vault mounts
    Path      Type     Description
    generic/  generic
@@ -53,6 +56,7 @@ This writes the pair value=world to the path secret/hello. The secret/ prefix is
 ```
 
 #### AWS credentials generation
+
 The AWS secret backend for Vault generates AWS access credentials dynamically based on IAM policies. This makes IAM much easier to use: credentials could be generated on the fly.
 The first step to using the aws backend is to mount it. Unlike the generic backend, the aws backend is not mounted by default.
 
