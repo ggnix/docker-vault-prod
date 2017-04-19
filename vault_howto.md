@@ -73,6 +73,38 @@ Next, we must configure the root credentials that are used to manage IAM credent
     secret_key=R4nm063hgMVo4BTT5xOs5nHLeLXA6lar7ZJ3Nt0i \
     region=us-east-1
 ```
+The aws/config/root credentials need permission to manage dynamic IAM users. Here is an example IAM policy that would grant these permissions:
+
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "iam:AttachUserPolicy",
+        "iam:CreateAccessKey",
+        "iam:CreateUser",
+        "iam:DeleteAccessKey",
+        "iam:DeleteUser",
+        "iam:DeleteUserPolicy",
+        "iam:DetachUserPolicy",
+        "iam:ListAccessKeys",
+        "iam:ListAttachedUserPolicies",
+        "iam:ListGroupsForUser",
+        "iam:ListUserPolicies",
+        "iam:PutUserPolicy",
+        "iam:RemoveUserFromGroup"
+      ],
+      "Resource": [
+      "arn:aws:iam::ACCOUNT-ID-WITHOUT-HYPHENS:user/vault-*"
+      ]
+    }
+  ]
+}
+```
+
+*NOTE: This policy example should be applied to the IAM user (or role) associated with the root credentials that you wrote to aws/config/root*
 
 Let's create ec2 readonly role using existing aws policy:
 
