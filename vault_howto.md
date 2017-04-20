@@ -174,3 +174,15 @@ To generate a new set of IAM credentials, we simply read from that role
 ```
 
 Now you can write and read your secrets just as you did for dev mode.
+
+### Accessing Vault from Jenkins
+
+#### Install hashicorp-vault-plugin on Jenkins * [link](https://wiki.jenkins-ci.org/display/JENKINS/HashiCorp+Vault+Plugin)
+
+The Vault plugin allows you to define the vault server URL as well as the root token
+
+![ScreenShot](global.png)
+
+Then in your job in the under **Build Environment** you check off **Vault Plugin** and configure the path to the secret in vault, and add key/value pairs to set environment variables with the values of keys in the vault path
+
+![ScreenShot](job_config.png)
